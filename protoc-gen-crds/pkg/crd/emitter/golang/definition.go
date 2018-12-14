@@ -2,7 +2,6 @@ package golang
 
 import (
 	"bytes"
-	"fmt"
 	"sort"
 	"strings"
 	"text/template"
@@ -86,14 +85,8 @@ func (spec {{$type.Name}}) UnmarshalJSON(b []byte) error {
 {{end}}
 `
 
-var funcMap = map[string]interface{}{
-	"asGoType":      asGoType,
-	"asGoFieldName": asGoFieldName,
-	"jsonSpec":      jsonSpec,
-}
-
 var definitionTemplate = template.
-	Must(template.New("template").Funcs(funcMap).Parse(definitionTmpl))
+	Must(template.New("template").Parse(definitionTmpl))
 
 type definitionContext struct {
 	PackageName string
@@ -156,43 +149,4 @@ func addTypes(types map[*openapi.Object]struct{}, t openapi.Type) {
 	case *openapi.Array:
 		addTypes(types, ty.ElementType)
 	}
-}
-
-func asGoFieldName(s string) (string, error) {
-	return naming.PascalCase(s), nil
-}
-
-func asGoType(t openapi.Type) (string, error) {
-	switch st := t.(type) {
-	case *openapi.Primitive:
-		return asGoPrimitive(st)
-	case *openapi.Array:
-		el, err := asGoType(st.ElementType)
-		if err != nil {
-			return "", err
-		}
-		return "[]" + el, nil
-	case *openapi.Object:
-		return "*" + st.Name, nil
-	default:
-		return "", fmt.Errorf("unknown type: %v", t)
-	}
-}
-
-func asGoPrimitive(p *openapi.Primitive) (string, error) {
-	switch p.Type {
-	case openapi.TypeInt32:
-		return "int", nil
-	case openapi.TypeString:
-		return "string", nil
-	case openapi.TypeBool:
-		return "bool", nil
-	default:
-		return "", fmt.Errorf("unknown primitive type: %v", p)
-	}
-}
-
-func jsonSpec(f openapi.Field) string {
-	s := fmt.Sprintf("`json:\"%s,omitempty\"`", naming.CamelCase(f.Name))
-	return s
 }
