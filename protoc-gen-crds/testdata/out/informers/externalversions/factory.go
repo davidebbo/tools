@@ -22,7 +22,7 @@ import (
 	time "time"
 
 	versioned "istio.io/tools/protoc-gen-crds/testdata/out/clientset/versioned"
-	config_istio_io "istio.io/tools/protoc-gen-crds/testdata/out/informers/externalversions/config.istio.io"
+	configistioio "istio.io/tools/protoc-gen-crds/testdata/out/informers/externalversions/config.istio.io"
 	internalinterfaces "istio.io/tools/protoc-gen-crds/testdata/out/informers/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -170,9 +170,9 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Config() config_istio_io.Interface
+	Config() configistioio.Interface
 }
 
-func (f *sharedInformerFactory) Config() config_istio_io.Interface {
-	return config_istio_io.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Config() configistioio.Interface {
+	return configistioio.New(f, f.namespace, f.tweakListOptions)
 }

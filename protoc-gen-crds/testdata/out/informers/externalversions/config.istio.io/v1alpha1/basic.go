@@ -20,7 +20,7 @@ import (
 	time "time"
 
 	versioned "istio.io/tools/protoc-gen-crds/testdata/out/clientset/versioned"
-	config_istio_io_v1alpha1 "istio.io/tools/protoc-gen-crds/testdata/out/config.istio.io/v1alpha1"
+	configistioiov1alpha1 "istio.io/tools/protoc-gen-crds/testdata/out/config.istio.io/v1alpha1"
 	internalinterfaces "istio.io/tools/protoc-gen-crds/testdata/out/informers/externalversions/internalinterfaces"
 	v1alpha1 "istio.io/tools/protoc-gen-crds/testdata/out/listers/config.istio.io/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -68,7 +68,7 @@ func NewFilteredBasicInformer(client versioned.Interface, namespace string, resy
 				return client.ConfigV1alpha1().Basics(namespace).Watch(options)
 			},
 		},
-		&config_istio_io_v1alpha1.Basic{},
+		&configistioiov1alpha1.Basic{},
 		resyncPeriod,
 		indexers,
 	)
@@ -79,7 +79,7 @@ func (f *basicInformer) defaultInformer(client versioned.Interface, resyncPeriod
 }
 
 func (f *basicInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&config_istio_io_v1alpha1.Basic{}, f.defaultInformer)
+	return f.factory.InformerFor(&configistioiov1alpha1.Basic{}, f.defaultInformer)
 }
 
 func (f *basicInformer) Lister() v1alpha1.BasicLister {
