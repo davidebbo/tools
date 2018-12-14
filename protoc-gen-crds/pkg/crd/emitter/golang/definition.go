@@ -18,6 +18,11 @@ const definitionTmpl = `//
 package {{.PackageName}}
 
 import (
+	"bytes"
+
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
+	"istio.io/tools/protoc-gen-crds/testdata"	// TODO: generate this properly
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -53,9 +58,31 @@ type {{.ListName}} struct {
 }
 {{ range $oid, $type := .ObjectTypes }}
 
-type {{$type.Name}} struct { {{ range $fid, $field := $type.Fields }}
-	{{asGoFieldName $field.Name}} {{asGoType $field.Type}} {{jsonSpec $field}}{{end}}
+// TODO: where do we get the name of the original type, e.g. testdata.BasicMessage?
+type {{$type.Name}} testdata.BasicMessage
+
+// TODO: everything that follows is really only needed for the top level type
+
+func (m *{{$type.Name}}) Reset()         { *m = {{$type.Name}}{} }
+func (m *{{$type.Name}}) String() string { return proto.CompactTextString(m) }
+func (*{{$type.Name}}) ProtoMessage()    {}
+
+// Implement proto.Message
+func (spec {{$type.Name}}) MarshalJSON() ([]byte, error) {
+	j := &bytes.Buffer{}
+	marshaler := &jsonpb.Marshaler{}
+	err := marshaler.Marshal(j, &spec)
+	if err != nil {
+		return nil, err
+	}
+	return j.Bytes(), nil
 }
+
+// TODO: do we need to actually implement this? Guessing it won't get called
+func (spec {{$type.Name}}) UnmarshalJSON(b []byte) error {
+	return nil
+}
+
 {{end}}
 `
 
