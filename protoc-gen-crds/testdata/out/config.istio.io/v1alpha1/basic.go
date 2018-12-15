@@ -55,13 +55,7 @@ func (*BasicSpec) ProtoMessage()    {}
 
 // Implement proto.Message
 func (spec BasicSpec) MarshalJSON() ([]byte, error) {
-	j := &bytes.Buffer{}
-	marshaler := &jsonpb.Marshaler{}
-	err := marshaler.Marshal(j, &spec)
-	if err != nil {
-		return nil, err
-	}
-	return j.Bytes(), nil
+	return marshalJSONProtobufHelper(&spec)
 }
 
 // TODO: do we need to actually implement this? Guessing it won't get called
@@ -82,13 +76,7 @@ func (*InnerMessage) ProtoMessage()    {}
 
 // Implement proto.Message
 func (spec InnerMessage) MarshalJSON() ([]byte, error) {
-	j := &bytes.Buffer{}
-	marshaler := &jsonpb.Marshaler{}
-	err := marshaler.Marshal(j, &spec)
-	if err != nil {
-		return nil, err
-	}
-	return j.Bytes(), nil
+	return marshalJSONProtobufHelper(&spec)
 }
 
 // TODO: do we need to actually implement this? Guessing it won't get called
@@ -97,3 +85,13 @@ func (spec InnerMessage) UnmarshalJSON(b []byte) error {
 }
 
 
+
+func marshalJSONProtobufHelper(pb proto.Message) ([]byte, error) {
+	j := &bytes.Buffer{}
+	marshaler := &jsonpb.Marshaler{}
+	err := marshaler.Marshal(j, pb)
+	if err != nil {
+		return nil, err
+	}
+	return j.Bytes(), nil
+}
